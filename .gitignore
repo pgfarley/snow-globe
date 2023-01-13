@@ -15,3 +15,7 @@ dmypy.json
 #verilog
 sim_build
 *.vcd
+results.xml
+
+#vim
+*.swp
