@@ -10,7 +10,7 @@ test_simple_480p:
 	rm -rf sim_build/
 	mkdir sim_build/
 	iverilog -o sim_build/sim.vvp -s simple_480p -s dump -g2012 src/simple_480p.sv test/dump_simple_480p.v 
-	PYTHONOPTIMIZE=${NOASSERT} MODULE=test.test_simple_480p vvp -M $$(cocotb-config --prefix)/cocotb/libs -m libcocotbvpi_icarus sim_build/sim.vvp
+	PYTHONOPTIMIZE=${NOASSERT} MODULE=test_simple_480p vvp -M $$(cocotb-config --prefix)/cocotb/libs -m libcocotbvpi_icarus sim_build/sim.vvp
 	! grep failure results.xml
 
 clean:

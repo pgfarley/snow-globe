@@ -45,8 +45,8 @@ async def test_max_active_positions(dut):
         highest_vertical_position = max(dut.sy.value.integer, highest_vertical_position)
         await RisingEdge(dut.clk_pix)
 
-    assert highest_horizontal_position == HORIZONTAL_LAST_POSITION, f"{highest_horizontal_position=} {HORIZONTAL_LAST_POSITION=}"
-    assert highest_vertical_position == VERTICAL_LAST_POSITION, f"{highest_vertical_position=} {VERTICAL_LAST_POSITION=}"
+    assert highest_horizontal_position == HORIZONTAL_LAST_POSITION
+    assert highest_vertical_position == VERTICAL_LAST_POSITION
 
 
 
