@@ -1,0 +1,8 @@
++parameter+simple_480p.H_ACTIVE=16
++parameter+simple_480p.H_FRONT_PORCH=1
++parameter+simple_480p.H_SYNC_PULSE=4
++parameter+simple_480p.H_BACK_PORCH=3
++parameter+simple_480p.V_ACTIVE=16
++parameter+simple_480p.V_FRONT_PORCH=1
++parameter+simple_480p.V_SYNC_PULSE=2
++parameter+simple_480p.V_BACK_PORCH=4
