@@ -6,10 +6,10 @@ from cocotb.triggers import RisingEdge, FallingEdge, ClockCycles, with_timeout
 @cocotb.test()
 async def test_max_active_positions(dut):
 
-    HORIZONTAL_LAST_ACTIVE_POSITION = dut.HA_END.value
-    HORIZONTAL_SYNC_START = HORIZONTAL_LAST_ACTIVE_POSITION + 16
-    HORIZONTAL_SYNC_END = HORIZONTAL_SYNC_START + 96
-    HORIZONTAL_LAST_POSITION   = dut.LINE.value           # last pixel on line (after back porch)
+    HORIZONTAL_LAST_ACTIVE_POSITION = dut.HORIZONTAL_ACTIVE_END_POSITION.value
+    HORIZONTAL_SYNC_START = HORIZONTAL_LAST_ACTIVE_POSITION + dut.HORIZONTAL_FRONT_PORCH.value
+    HORIZONTAL_SYNC_END = HORIZONTAL_SYNC_START + dut.HORIZONTAL_SYNC_PULSE.value
+    HORIZONTAL_LAST_POSITION = dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value + dut.HORIZONTAL_SYNC_PULSE.value + dut.HORIZONTAL_BACK_PORCH.value - 1
 
     VERTICAL_LAST_ACTIVE_POSITION = dut.VA_END.value
     VERTICAL_SYNC_START = VERTICAL_LAST_ACTIVE_POSITION + 10
@@ -52,7 +52,7 @@ async def test_max_active_positions(dut):
 
 
 @cocotb.test()
-async def test_simple_480p(dut):
+async def test_hsync(dut):
 
 
     clock = Clock(dut.clk_pix, 1, units="us")
@@ -63,12 +63,16 @@ async def test_simple_480p(dut):
 
     dut.rst_pix.value = 0
     await ClockCycles(dut.clk_pix, 1)
-    
+    assert dut.hsync.value == 1
 
-    await ClockCycles(dut.clk_pix, dut.HA_END.value + 15)
-    assert dut.hsync == 1
+    while dut.hsync.value == 1:
+        await ClockCycles(dut.clk_pix, 1)
 
-    await ClockCycles(dut.clk_pix,1)
-    assert dut.hsync == 0
+    assert dut.hsync.value.integer == 0
+    assert dut.sx.value.integer == dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value - 1
 
+    while dut.hsync.value == 0:
+        await ClockCycles(dut.clk_pix, 1)
 
+    assert dut.hsync.value.integer == 1
+    assert dut.sx.value.integer == dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value + dut.HORIZONTAL_SYNC_PULSE.value - 1
