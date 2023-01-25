@@ -6,7 +6,10 @@ from cocotb.triggers import RisingEdge, FallingEdge, ClockCycles, with_timeout
 @cocotb.test()
 async def test_max_active_positions(dut):
 
-    HORIZONTAL_LAST_POSITION = dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value + dut.HORIZONTAL_SYNC_PULSE.value + dut.HORIZONTAL_BACK_PORCH.value - 1
+    HORIZONTAL_LAST_POSITION = dut.HORIZONTAL_ACTIVE.value \
+    + dut.HORIZONTAL_FRONT_PORCH.value \
+    + dut.HORIZONTAL_SYNC_PULSE.value \
+    + dut.HORIZONTAL_BACK_PORCH.value - 1
 
     VERTICAL_LAST_ACTIVE_POSITION = dut.VA_END.value
     VERTICAL_SYNC_START = VERTICAL_LAST_ACTIVE_POSITION + 10
@@ -27,13 +30,13 @@ async def test_max_active_positions(dut):
     highest_horizontal_position = -1
     highest_vertical_position = -1
 
-    while dut.vsync.value.integer == 1: # active low
+    while dut.vsync.value.integer == 1: # active low: Not yet vsync
         highest_horizontal_position = max(dut.sx.value.integer, highest_horizontal_position)
         highest_vertical_position = max(dut.sy.value.integer, highest_vertical_position)
         await RisingEdge(dut.clk_pix)
 
     
-    while dut.vsync.value.integer == 0: # vsyc
+    while dut.vsync.value.integer == 0: # active low: vsync
         highest_horizontal_position = max(dut.sx.value.integer, highest_horizontal_position)
         highest_vertical_position = max(dut.sy.value.integer, highest_vertical_position)
         await RisingEdge(dut.clk_pix)
