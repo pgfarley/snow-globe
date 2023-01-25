@@ -36,24 +36,37 @@ module simple_480p (
     localparam HORIZONTAL_SYNC_END_POSITION = HORIZONTAL_SYNC_START_POSITION 
                                              + HORIZONTAL_SYNC_PULSE;
 
-    // vertical timings
-    parameter VA_END = 479;           // end of active pixels
-    parameter VS_STA = VA_END + 10;   // sync starts after front porch
-    parameter VS_END = VS_STA + 2;    // sync ends
-    parameter SCREEN = 524;           // last line on screen (after back porch)
+    parameter VERTICAL_ACTIVE = 480;
+    parameter VERTICAL_FRONT_PORCH = 11;
+    parameter VERTICAL_SYNC_PULSE = 2;
+    parameter VERTICAL_BACK_PORCH = 31;
+    
+    //  Max sy value. Includes blanking region.
+    localparam VERTICAL_LAST_POSITION = VERTICAL_ACTIVE 
+                       + VERTICAL_FRONT_PORCH 
+                       + VERTICAL_SYNC_PULSE 
+                       + VERTICAL_BACK_PORCH 
+                       - 1;
+    
+    localparam VERTICAL_ACTIVE_END_POSITION = VERTICAL_ACTIVE - 1;
+    localparam VERTICAL_SYNC_START_POSITION = VERTICAL_ACTIVE_END_POSITION 
+                                              + VERTICAL_FRONT_PORCH;
+    localparam VERTICAL_SYNC_END_POSITION = VERTICAL_SYNC_START_POSITION 
+                                            + VERTICAL_SYNC_PULSE;
 
+    
     always_comb begin
         // invert: syncs have negative polarity
         hsync = ~(sx >= HORIZONTAL_SYNC_START_POSITION && sx < HORIZONTAL_SYNC_END_POSITION);
-        vsync = ~(sy >= VS_STA && sy < VS_END);
-        de = (sx <= HORIZONTAL_ACTIVE_END_POSITION && sy <= VA_END);
+        vsync = ~(sy >= VERTICAL_SYNC_START_POSITION && sy < VERTICAL_SYNC_END_POSITION);
+        de = (sx <= HORIZONTAL_ACTIVE_END_POSITION && sy <= VERTICAL_ACTIVE_END_POSITION);
     end
 
     // calculate horizontal and vertical screen position
     always_ff @(posedge clk_pix) begin
         if (sx == HORIZONTAL_LAST_POSITION) begin
             sx <= 0;
-            sy <= (sy == SCREEN) ? 0 : sy + 1;  // last line on screen?
+            sy <= (sy == VERTICAL_LAST_POSITION) ? 0 : sy + 1;
         end else begin
             sx <= sx + 1;
         end

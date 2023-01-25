@@ -11,10 +11,10 @@ async def test_max_active_positions(dut):
     + dut.HORIZONTAL_SYNC_PULSE.value \
     + dut.HORIZONTAL_BACK_PORCH.value - 1
 
-    VERTICAL_LAST_ACTIVE_POSITION = dut.VA_END.value
-    VERTICAL_SYNC_START = VERTICAL_LAST_ACTIVE_POSITION + 10
-    VERTICAL_SYNC_END = VERTICAL_SYNC_START + 2
-    VERTICAL_LAST_POSITION = dut.SCREEN.value
+    VERTICAL_LAST_POSITION = dut.VERTICAL_ACTIVE.value \
+    + dut.VERTICAL_FRONT_PORCH.value \
+    + dut.VERTICAL_SYNC_PULSE.value \
+    + dut.VERTICAL_BACK_PORCH.value - 1
 
 
     clock = Clock(dut.clk_pix, 1, units="us")
