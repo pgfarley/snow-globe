@@ -6,9 +6,6 @@ from cocotb.triggers import RisingEdge, FallingEdge, ClockCycles, with_timeout
 @cocotb.test()
 async def test_max_active_positions(dut):
 
-    HORIZONTAL_LAST_ACTIVE_POSITION = dut.HORIZONTAL_ACTIVE_END_POSITION.value
-    HORIZONTAL_SYNC_START = HORIZONTAL_LAST_ACTIVE_POSITION + dut.HORIZONTAL_FRONT_PORCH.value
-    HORIZONTAL_SYNC_END = HORIZONTAL_SYNC_START + dut.HORIZONTAL_SYNC_PULSE.value
     HORIZONTAL_LAST_POSITION = dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value + dut.HORIZONTAL_SYNC_PULSE.value + dut.HORIZONTAL_BACK_PORCH.value - 1
 
     VERTICAL_LAST_ACTIVE_POSITION = dut.VA_END.value
