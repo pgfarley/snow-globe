@@ -6,15 +6,15 @@ from cocotb.triggers import RisingEdge, FallingEdge, ClockCycles, with_timeout
 @cocotb.test()
 async def test_max_active_positions(dut):
 
-    HORIZONTAL_LAST_POSITION = dut.HORIZONTAL_ACTIVE.value \
-    + dut.HORIZONTAL_FRONT_PORCH.value \
-    + dut.HORIZONTAL_SYNC_PULSE.value \
-    + dut.HORIZONTAL_BACK_PORCH.value - 1
+    H_LAST_POSITION = dut.H_ACTIVE.value \
+    + dut.H_FRONT_PORCH.value \
+    + dut.H_SYNC_PULSE.value \
+    + dut.H_BACK_PORCH.value - 1
 
-    VERTICAL_LAST_POSITION = dut.VERTICAL_ACTIVE.value \
-    + dut.VERTICAL_FRONT_PORCH.value \
-    + dut.VERTICAL_SYNC_PULSE.value \
-    + dut.VERTICAL_BACK_PORCH.value - 1
+    V_LAST_POSITION = dut.V_ACTIVE.value \
+    + dut.V_FRONT_PORCH.value \
+    + dut.V_SYNC_PULSE.value \
+    + dut.V_BACK_PORCH.value - 1
 
 
     clock = Clock(dut.clk_pix, 1, units="us")
@@ -46,8 +46,8 @@ async def test_max_active_positions(dut):
         highest_vertical_position = max(dut.sy.value.integer, highest_vertical_position)
         await RisingEdge(dut.clk_pix)
 
-    assert highest_horizontal_position == HORIZONTAL_LAST_POSITION
-    assert highest_vertical_position == VERTICAL_LAST_POSITION
+    assert highest_horizontal_position == H_LAST_POSITION
+    assert highest_vertical_position == V_LAST_POSITION
 
 
 
@@ -69,10 +69,10 @@ async def test_hsync(dut):
         await ClockCycles(dut.clk_pix, 1)
 
     assert dut.hsync.value.integer == 0
-    assert dut.sx.value.integer == dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value - 1
+    assert dut.sx.value.integer == dut.H_ACTIVE.value + dut.H_FRONT_PORCH.value - 1
 
     while dut.hsync.value == 0:
         await ClockCycles(dut.clk_pix, 1)
 
     assert dut.hsync.value.integer == 1
-    assert dut.sx.value.integer == dut.HORIZONTAL_ACTIVE.value + dut.HORIZONTAL_FRONT_PORCH.value + dut.HORIZONTAL_SYNC_PULSE.value - 1
+    assert dut.sx.value.integer == dut.H_ACTIVE.value + dut.H_FRONT_PORCH.value + dut.H_SYNC_PULSE.value - 1

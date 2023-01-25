@@ -18,55 +18,51 @@ module simple_480p (
     );
 
    
-    parameter HORIZONTAL_ACTIVE = 640;
-    parameter HORIZONTAL_FRONT_PORCH = 16;
-    parameter HORIZONTAL_SYNC_PULSE = 96;
-    parameter HORIZONTAL_BACK_PORCH = 48;
+    parameter H_ACTIVE = 640;
+    parameter H_FRONT_PORCH = 16;
+    parameter H_SYNC_PULSE = 96;
+    parameter H_BACK_PORCH = 48;
     
     //  Max sx value. Includes blanking region.
-    localparam HORIZONTAL_LAST_POSITION = HORIZONTAL_ACTIVE 
-                       + HORIZONTAL_FRONT_PORCH 
-                       + HORIZONTAL_SYNC_PULSE 
-                       + HORIZONTAL_BACK_PORCH 
+    localparam H_LAST_POSITION = H_ACTIVE 
+                       + H_FRONT_PORCH 
+                       + H_SYNC_PULSE 
+                       + H_BACK_PORCH 
                        - 1;
     
-    localparam HORIZONTAL_ACTIVE_END_POSITION = HORIZONTAL_ACTIVE - 1;
-    localparam HORIZONTAL_SYNC_START_POSITION = HORIZONTAL_ACTIVE_END_POSITION 
-                                               + HORIZONTAL_FRONT_PORCH;
-    localparam HORIZONTAL_SYNC_END_POSITION = HORIZONTAL_SYNC_START_POSITION 
-                                             + HORIZONTAL_SYNC_PULSE;
+    localparam H_ACTIVE_END_POSITION = H_ACTIVE - 1;
+    localparam H_SYNC_START_POSITION = H_ACTIVE_END_POSITION + H_FRONT_PORCH;
+    localparam H_SYNC_END_POSITION = H_SYNC_START_POSITION + H_SYNC_PULSE;
 
-    parameter VERTICAL_ACTIVE = 480;
-    parameter VERTICAL_FRONT_PORCH = 11;
-    parameter VERTICAL_SYNC_PULSE = 2;
-    parameter VERTICAL_BACK_PORCH = 31;
+    parameter V_ACTIVE = 480;
+    parameter V_FRONT_PORCH = 11;
+    parameter V_SYNC_PULSE = 2;
+    parameter V_BACK_PORCH = 31;
     
     //  Max sy value. Includes blanking region.
-    localparam VERTICAL_LAST_POSITION = VERTICAL_ACTIVE 
-                       + VERTICAL_FRONT_PORCH 
-                       + VERTICAL_SYNC_PULSE 
-                       + VERTICAL_BACK_PORCH 
+    localparam V_LAST_POSITION = V_ACTIVE 
+                       + V_FRONT_PORCH 
+                       + V_SYNC_PULSE 
+                       + V_BACK_PORCH 
                        - 1;
     
-    localparam VERTICAL_ACTIVE_END_POSITION = VERTICAL_ACTIVE - 1;
-    localparam VERTICAL_SYNC_START_POSITION = VERTICAL_ACTIVE_END_POSITION 
-                                              + VERTICAL_FRONT_PORCH;
-    localparam VERTICAL_SYNC_END_POSITION = VERTICAL_SYNC_START_POSITION 
-                                            + VERTICAL_SYNC_PULSE;
+    localparam V_ACTIVE_END_POSITION = V_ACTIVE - 1;
+    localparam V_SYNC_START_POSITION = V_ACTIVE_END_POSITION + V_FRONT_PORCH;
+    localparam V_SYNC_END_POSITION = V_SYNC_START_POSITION + V_SYNC_PULSE;
 
     
     always_comb begin
         // invert: syncs have negative polarity
-        hsync = ~(sx >= HORIZONTAL_SYNC_START_POSITION && sx < HORIZONTAL_SYNC_END_POSITION);
-        vsync = ~(sy >= VERTICAL_SYNC_START_POSITION && sy < VERTICAL_SYNC_END_POSITION);
-        de = (sx <= HORIZONTAL_ACTIVE_END_POSITION && sy <= VERTICAL_ACTIVE_END_POSITION);
+        hsync = ~(sx >= H_SYNC_START_POSITION && sx < H_SYNC_END_POSITION);
+        vsync = ~(sy >= V_SYNC_START_POSITION && sy < V_SYNC_END_POSITION);
+        de = (sx <= H_ACTIVE_END_POSITION && sy <= V_ACTIVE_END_POSITION);
     end
 
     // calculate horizontal and vertical screen position
     always_ff @(posedge clk_pix) begin
-        if (sx == HORIZONTAL_LAST_POSITION) begin
+        if (sx == H_LAST_POSITION) begin
             sx <= 0;
-            sy <= (sy == VERTICAL_LAST_POSITION) ? 0 : sy + 1;
+            sy <= (sy == V_LAST_POSITION) ? 0 : sy + 1;
         end else begin
             sx <= sx + 1;
         end
