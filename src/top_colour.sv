@@ -44,7 +44,8 @@ module top_colour (
     // determine colour from screen position
     logic [3:0] paint_r, paint_g, paint_b;
     always_comb begin
-        if (sx < 256 && sy < 256) begin  // colour square in top-left 256x256 pixels
+        if (sx < 640 && sy < 480) begin  // colour square in top-left 256x256 pixels
+//        if (sx < 256 && sy < 256) begin  // colour square in top-left 256x256 pixels
             paint_r = sx[7:4];  // 16 horizontal pixels of each red level
             paint_g = sy[7:4];  // 16 vertical pixels of each green level
             paint_b = 4'h4;     // constant blue level

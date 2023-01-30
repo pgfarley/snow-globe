@@ -12,10 +12,13 @@ ipython_config.py
 .dmypy.json
 dmypy.json
 
-#verilog
+# build artifacts
+out
 sim_build
 *.vcd
 results.xml
 
-#vim
+# vim
 *.swp
+
+
