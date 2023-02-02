@@ -84,3 +84,26 @@ async def test_vsync(dut):
 
     await RisingEdge(dut.vsync)
     assert dut.sy.value.integer == dut.V_ACTIVE.value + dut.V_FRONT_PORCH.value + dut.V_SYNC_PULSE.value - 1
+
+
+@cocotb.test()
+async def test_display_enabled(dut):
+
+    clock = Clock(dut.clk_pix, 1, units="us")
+    cocotb.start_soon(clock.start())
+    
+    await reset(dut)
+
+    await FallingEdge(dut.de)
+    assert dut.sx.value.integer == dut.H_ACTIVE.value 
+    assert dut.sy.value.integer == 0
+
+    for _i in range(0, dut.V_ACTIVE.value - 1):
+        await FallingEdge(dut.de)
+
+    assert dut.sx.value.integer == dut.H_ACTIVE.value
+    assert dut.sy.value.integer == dut.V_ACTIVE.value - 1
+
+    await RisingEdge(dut.de)
+    assert dut.sx.value.integer == 0
+    assert dut.sy.value.integer == 0
