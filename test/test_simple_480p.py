@@ -12,6 +12,9 @@ async def reset(dut):
 
     await RisingEdge(dut.clk_pix)
 
+def is_hsync(dut) -> bool:
+    return  dut.hsync.value.integer == 0 # active low: vsync
+
 def is_vsync(dut) -> bool:
     return  dut.vsync.value.integer == 0 # active low: vsync
 
@@ -60,21 +63,10 @@ async def test_hsync(dut):
     clock = Clock(dut.clk_pix, 1, units="us")
     cocotb.start_soon(clock.start())
     
-    dut.rst_pix.value = 1
-    await ClockCycles(dut.clk_pix, 1)
+    await reset(dut)
 
-    dut.rst_pix.value = 0
-    await ClockCycles(dut.clk_pix, 1)
-    assert dut.hsync.value == 1
-
-    while dut.hsync.value == 1:
-        await ClockCycles(dut.clk_pix, 1)
-
-    assert dut.hsync.value.integer == 0
+    await FallingEdge(dut.hsync)
     assert dut.sx.value.integer == dut.H_ACTIVE.value + dut.H_FRONT_PORCH.value - 1
 
-    while dut.hsync.value == 0:
-        await ClockCycles(dut.clk_pix, 1)
-
-    assert dut.hsync.value.integer == 1
+    await RisingEdge(dut.hsync)
     assert dut.sx.value.integer == dut.H_ACTIVE.value + dut.H_FRONT_PORCH.value + dut.H_SYNC_PULSE.value - 1
