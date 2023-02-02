@@ -1,8 +1,12 @@
+all: test
+
+TOPLEVEL_LANG ?= verilog
+include $(shell cocotb-config --makefiles)/Makefile.inc
+
 export COCOTB_REDUCED_LOG_FMT=1
 export PYTHONPATH := test:$(PYTHONPATH)
 export LIBPYTHON_LOC=$(shell cocotb-config --libpython)
 
-all: test
 test: test_simple_480p
 
 test_simple_480p:
@@ -14,6 +18,6 @@ test_simple_480p:
 	! grep failure results.xml
 
 clean:
-	rm -rf *vcd sim_build test/__pycache__
+	rm -rf *vcd sim_build test/__pycache__ results.xml
 
-.PHONY: clean
+.PHONY: clean all test test_simple_480p 
