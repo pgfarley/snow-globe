@@ -59,7 +59,6 @@ async def test_max_active_positions(dut):
 @cocotb.test()
 async def test_hsync(dut):
 
-
     clock = Clock(dut.clk_pix, 1, units="us")
     cocotb.start_soon(clock.start())
     
@@ -70,3 +69,18 @@ async def test_hsync(dut):
 
     await RisingEdge(dut.hsync)
     assert dut.sx.value.integer == dut.H_ACTIVE.value + dut.H_FRONT_PORCH.value + dut.H_SYNC_PULSE.value - 1
+
+
+@cocotb.test()
+async def test_vsync(dut):
+
+    clock = Clock(dut.clk_pix, 1, units="us")
+    cocotb.start_soon(clock.start())
+    
+    await reset(dut)
+
+    await FallingEdge(dut.vsync)
+    assert dut.sy.value.integer == dut.V_ACTIVE.value + dut.V_FRONT_PORCH.value - 1
+
+    await RisingEdge(dut.vsync)
+    assert dut.sy.value.integer == dut.V_ACTIVE.value + dut.V_FRONT_PORCH.value + dut.V_SYNC_PULSE.value - 1
