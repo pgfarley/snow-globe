@@ -1,2 +1,2 @@
 # snow-globe
-![demo](doc/snow_globe.gof)
+![demo](doc/snow_globe.gif)
