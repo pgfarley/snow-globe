@@ -12,6 +12,11 @@ module top_snow_globe (
     );
 
 
+    reg [15:0] lfsr_slow;
+    reg [15:0] lfsr_fast;
+    reg [15:0] lfsr_fastest;
+
+
     // generate pixel clock
     logic clk_pix;
     logic clk_pix_locked;
@@ -39,16 +44,17 @@ module top_snow_globe (
 
   reg [4:0] screen_count;
   reg [4:0] last_screen_count;
-  wire new_screen = vpos == 0 & hpos == 0;
+  wire new_screen = sy == 0 & sx == 0;
   
   reg [2:0] screen_mem [255*255-1:0];
   wire is_snow;
   
-  always @(posedge clk_12m)
+  always @(posedge clk_pix)
     begin
       if (btn_rst) begin
         last_screen_count <= 0;
         screen_count <= 0;
+
       end else begin
         if (new_screen) begin
            last_screen_count <= screen_count;
@@ -57,7 +63,7 @@ module top_snow_globe (
       end
     end
   
-  always @(posedge clk_12m) begin
+  always @(posedge clk_pix) begin
       if (snow_slow)
         screen_mem[{sy[7:0],sx[7:0]}][0] <= &lfsr_slow[14:8];
  
@@ -76,30 +82,30 @@ module top_snow_globe (
 
 
 
-  lfsr #(16, 16'b1101000000001000) lfsr_gen_slow(
-    .clk(clk_12),
-    .reset(btn_rst),
+  lfsr #(.LEN(16), .TAPS(16'b1101000000001000)) lfsr_gen_slow(
+    .clk(clk_pix),
+    .rst(btn_rst),
     .en(snow_slow),
-    .seed(0),
+    .seed(16'd0),
     .sreg(lfsr_slow));
 
-  lfsr #(16, 16'b1101000000001000) lfsr_gen_fast(
-    .clk(clk_12),
-    .reset(btn_rst),
+  lfsr #(.LEN(16), .TAPS(16'b1101000000001000)) lfsr_gen_fast(
+    .clk(clk_pix),
+    .rst(btn_rst),
     .en(snow_fast),
-    .seed(0),
+    .seed(16'd0),
     .sreg(lfsr_fast));
 
-  lfsr #(16,16'b1101000000001000) lfsr_gen_fastest(
-    .clk(clk_12),
-    .reset(btn_rst),
+  lfsr #(.LEN(16), .TAPS(16'b1101000000001000)) lfsr_gen_fastest(
+    .clk(clk_pix),
+    .rst(btn_rst),
     .en(snow_fastest),
-    .seed(0),
+    .seed(16'd0),
     .sreg(lfsr_fastest));
 
   ;
 
-    wire is_snow = |screen_mem[{vpos[7:0],hpos[7:0]}] ? 7 : 0;
+    wire is_snow = |screen_mem[{sy[7:0],sx[7:0]}] ? 7 : 0;
 
 
     always_ff @(posedge clk_pix) begin
@@ -107,14 +113,13 @@ module top_snow_globe (
         vga_vsync <= vsync;
         if (de) begin
 
-            |screen_mem[{vpos[7:0],hpos[7:0]}] ? 7 : 0;
-            vga_r <= paint_r;
-            vga_g <= paint_g;
-            vga_b <= paint_b;
-        end else begin  // VGA colour should be black in blanking interval
             vga_r <= {4{is_snow}};
             vga_g <= {4{is_snow}};
             vga_b <= {4{is_snow}};
+        end else begin  // VGA colour should be black in blanking interval
+            vga_r <= 0;
+            vga_g <= 0;
+            vga_b <= 0;
         end
     end
 endmodule
